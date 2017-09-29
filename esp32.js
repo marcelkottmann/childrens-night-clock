@@ -27,9 +27,10 @@ function httpServer(port, cb) {
             socket.onData = function (data) {
                 complete = complete + data;
                 if (complete.length >= 4 && complete.substring(complete.length - 4) === '\r\n\r\n') {
-                    var path = complete.substring(4, complete.indexOf(' ', 4))
+                    var startOfPath = complete.indexOf(' ');
+                    var path = complete.substring(startOfPath + 1, complete.indexOf(' ', startOfPath + 1))
                     cb({
-                        method: complete.substring(0, 3),
+                        method: complete.substring(0, startOfPath),
                         raw: complete,
                         path: path
                     },
@@ -56,7 +57,16 @@ function httpServer(port, cb) {
 }
 
 httpServer(9999, function (req, res) {
-    res.end(page('Request summary', req.method + '<br />' + req.path + '<br />' + req.raw));
+    if (req.path === '/restart') {
+        if (req.method === 'GET') {
+            res.end(page('Request restart', '<form action="/restart" method="post"><input type="submit" value="Restart" /></form>'));
+        } else {
+            res.end(page('Restarting...', ''));
+            restart();
+        }
+    } else {
+        res.end(page('Request summary', req.method + '<br />' + req.path + '<br />' + req.raw));
+    }
 });
 
 var dateIdx = complete.indexOf('Date: ');
