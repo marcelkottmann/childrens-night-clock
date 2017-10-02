@@ -6,66 +6,37 @@ function printInfo() {
 }
 printInfo();
 
-function page(headline, text) {
-    return 'HTTP/1.1 200 OK\r\n' +//
-        'Connection: close\r\n' +//
-        'Content-type: text/html\r\n\r\n' +//
-        '<!doctype html>' +//
-        '<html>' +//
-        '<head><title>esp32-javascript</title></head>' +//
-        '<body>' +//
-        '<h1>' + headline + '</h1>' + text +//
-        '</body>' +//
-        '</html>\r\n\r\n';
+var state_r = [0, 0, 0, 0, 0, 0, 0, 0];
+var state_g = [0, 0, 0, 0, 0, 0, 0, 0];
+var state_b = [0, 0, 0, 0, 0, 0, 0, 0];
+
+function updateLed(num, r, g, b) {
+    state_r[num] = r;
+    state_g[num] = g;
+    state_b[num] = b;
+    setLedColor(num, r, g, b);
 }
 
-
-function httpServer(port, cb) {
-    sockListen(9999,
-        function (socket) {
-            var complete = '';
-            socket.onData = function (data) {
-                complete = complete + data;
-                if (complete.length >= 4 && complete.substring(complete.length - 4) === '\r\n\r\n') {
-                    var startOfPath = complete.indexOf(' ');
-                    var path = complete.substring(startOfPath + 1, complete.indexOf(' ', startOfPath + 1))
-                    cb({
-                        method: complete.substring(0, startOfPath),
-                        raw: complete,
-                        path: path
-                    },
-                        {
-                            end: function (data) {
-                                writeSocket(socket.sockfd, data);
-                                closeSocket(socket.sockfd);
-                                removeSocketFromSockets(socket.sockfd);
-                            }
-                        }
-                    );
-                }
-            };
-            socket.onError = function () {
-                print('NEW SOCK: ON ERROR');
-            };
-        },
-        function () {
-            print('ON ERROR');
-        },
-        function () {
-            print('SOCKET WAS CLOSED!');
-        });
+function getLedHtmlColor(num) {
+    return '#' + (state_r[num] ? 'f' : '0') + (state_g[num] ? 'f' : '0') + (state_b[num] ? 'f' : '0')
 }
 
-httpServer(9999, function (req, res) {
-    if (req.path === '/restart') {
-        if (req.method === 'GET') {
-            res.end(page('Request restart', '<form action="/restart" method="post"><input type="submit" value="Restart" /></form>'));
-        } else {
-            res.end(page('Restarting...', ''));
-            restart();
-        }
-    } else {
-        res.end(page('Request summary', req.method + '<br />' + req.path + '<br />' + req.raw));
+function createLedTable() {
+    return '<table><tr>' +
+        '<td style="background-color:' + getLedHtmlColor(0) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(1) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(2) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(3) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(4) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(5) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(6) + '">&nbsp;</td>' +
+        '<td style="background-color:' + getLedHtmlColor(7) + '">&nbsp;</td>' +
+        '</tr></table>'
+}
+
+requestHandler.push(function handleRequest(req, res) {
+    if (req.path === '/status') {
+        res.end(page('Status', '<div>Time: ' + hours + ':' + minutes + ':' + seconds + '</div>' + createLedTable()));
     }
 });
 
@@ -80,32 +51,32 @@ var end = 6;
 function update() {
     print("Time: " + hours + ":" + minutes + ":" + seconds);
     if (hours >= 19 || hours < end) {
-        setLedColor(0, 1, 0, 0);
+        updateLed(0, 1, 0, 0);
     }
     if (hours >= 21 || hours < end) {
-        setLedColor(1, 1, 0, 0);
+        updateLed(1, 1, 0, 0);
     }
     if (hours >= 22 || hours < end) {
-        setLedColor(2, 1, 0, 0);
+        updateLed(2, 1, 0, 0);
     }
     if (hours >= 0 && hours < end) {
-        setLedColor(3, 1, 0, 0);
+        updateLed(3, 1, 0, 0);
     }
     if (hours >= 2 && hours < end) {
-        setLedColor(4, 1, 0, 0);
+        updateLed(4, 1, 0, 0);
     }
     if (hours >= 3 && hours < end) {
-        setLedColor(5, 1, 0, 0);
+        updateLed(5, 1, 0, 0);
     }
     if (hours >= 4 && hours < end) {
-        setLedColor(6, 1, 0, 0);
+        updateLed(6, 1, 0, 0);
     }
     if (hours >= 5 && hours < end) {
-        setLedColor(7, 1, 0, 0);
+        updateLed(7, 1, 0, 0);
     }
     if (hours >= end && hours < end + 2) {
         for (i = 0; i < 8; i++) {
-            setLedColor(i, 0, 1, 0);
+            updateLed(i, 0, 1, 0);
         }
     }
 }
@@ -127,16 +98,16 @@ function loop() {
 
 function init() {
     for (i = 0; i < 8; i++) {
-        setLedColor(i, 0, 0, i * 30);
+        updateLed(i, 0, 0, i * 30);
     }
     for (i = 0; i < 8; i++) {
-        setLedColor(i, 0, i * 30, 0);
+        updateLed(i, 0, i * 30, 0);
     }
     for (i = 0; i < 8; i++) {
-        setLedColor(i, i * 30, 0, 0);
+        updateLed(i, i * 30, 0, 0);
     }
     for (i = 0; i < 8; i++) {
-        setLedColor(i, 0, 0, 1);
+        updateLed(i, 0, 0, 1);
     }
 
     setTimeout(function () {
