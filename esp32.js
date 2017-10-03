@@ -1,3 +1,14 @@
+// -- CONFIG
+wifiStopHours = 22;
+wifiStopMinutes = 10;
+wifiStartHours = 6;
+wifiStartMinutes = 15;
+//-- END
+
+stopWifi();
+
+//var wifi = true;
+
 function printInfo() {
     info();
     setTimeout(function () {
@@ -79,6 +90,21 @@ function update() {
             updateLed(i, 0, 1, 0);
         }
     }
+    if (hours >= end + 2 && hours < 19) {
+        for (i = 0; i < 8; i++) {
+            updateLed(i, 0, 0, 1);
+        }
+    }
+/*
+    if (hours >= wifiStopHours && minutes >= wifiStopMinutes && wifi) {
+        wifi = false;
+        stopWifi();
+    }
+*/
+    /*if (hours >= wifiStartHours && hours < wifiStopHours && minutes >= wifiStartMinutes && !wifi) {
+        wifi = true;
+        startWifi();
+    }*/
 }
 
 function loop() {
@@ -109,10 +135,7 @@ function init() {
     for (i = 0; i < 8; i++) {
         updateLed(i, 0, 0, 1);
     }
-
-    setTimeout(function () {
-        loop();
-    }, 1000);
+    loop();
 }
 
 init();
