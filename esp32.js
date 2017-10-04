@@ -47,7 +47,9 @@ function createLedTable() {
 
 requestHandler.push(function handleRequest(req, res) {
     if (req.path === '/status') {
-        res.end(page('Status', '<div>Time: ' + hours + ':' + minutes + ':' + seconds + '</div>' + createLedTable()));
+        res.end(page('Status', '<div>Time: ' + hours + ':' + minutes + ':' + seconds +
+            '</div><div>StartTime: ' + startTime + '</div>' +
+            createLedTable()));
     }
 });
 
@@ -56,11 +58,12 @@ var commaIdx = complete.indexOf(':', dateIdx + 5);
 var hours = 2 + parseInt(complete.substr(commaIdx - 2, 2));
 var minutes = parseInt(complete.substr(commaIdx + 1, 2));
 var seconds = parseInt(complete.substr(commaIdx + 4, 2));
-
+var startTime = hours + ':' + minutes + ':' + seconds;
 var end = 6;
 
 function update() {
     print("Time: " + hours + ":" + minutes + ":" + seconds);
+    print("StartTime: " + startTime);
     if (hours >= 19 || hours < end) {
         updateLed(0, 1, 0, 0);
     }
@@ -95,12 +98,12 @@ function update() {
             updateLed(i, 0, 0, 1);
         }
     }
-/*
-    if (hours >= wifiStopHours && minutes >= wifiStopMinutes && wifi) {
-        wifi = false;
-        stopWifi();
-    }
-*/
+    /*
+        if (hours >= wifiStopHours && minutes >= wifiStopMinutes && wifi) {
+            wifi = false;
+            stopWifi();
+        }
+    */
     /*if (hours >= wifiStartHours && hours < wifiStopHours && minutes >= wifiStartMinutes && !wifi) {
         wifi = true;
         startWifi();
