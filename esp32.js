@@ -1,13 +1,11 @@
 // -- CONFIG
 wifiStopHours = 22;
-wifiStopMinutes = 10;
+wifiStopMinutes = 30;
 wifiStartHours = 6;
 wifiStartMinutes = 15;
 //-- END
 
-stopWifi();
-
-//var wifi = true;
+var wifi = true;
 
 function printInfo() {
     info();
@@ -98,16 +96,18 @@ function update() {
             updateLed(i, 0, 0, 1);
         }
     }
-    /*
-        if (hours >= wifiStopHours && minutes >= wifiStopMinutes && wifi) {
-            wifi = false;
-            stopWifi();
-        }
-    */
-    /*if (hours >= wifiStartHours && hours < wifiStopHours && minutes >= wifiStartMinutes && !wifi) {
+
+    if (wifi && hours >= wifiStopHours && minutes >= wifiStopMinutes) {
+        print('Timebased wifi shutdown...')
+        wifi = false;
+        stopWifi();
+    }
+
+    if (!wifi && hours >= wifiStartHours && hours < wifiStopHours && minutes >= wifiStartMinutes) {
+        print('Timebased wifi startup...')
         wifi = true;
         startWifi();
-    }*/
+    }
 }
 
 function loop() {
