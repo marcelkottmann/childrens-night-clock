@@ -11,7 +11,7 @@ function printInfo() {
     info();
     setTimeout(function () {
         printInfo();
-    }, 60000);
+    }, 10000);
 }
 printInfo();
 
@@ -51,11 +51,11 @@ requestHandler.push(function handleRequest(req, res) {
     }
 });
 
-var dateIdx = complete.indexOf('Date: ');
-var commaIdx = complete.indexOf(':', dateIdx + 5);
-var hours = 2 + parseInt(complete.substr(commaIdx - 2, 2));
-var minutes = parseInt(complete.substr(commaIdx + 1, 2));
-var seconds = parseInt(complete.substr(commaIdx + 4, 2));
+var dateIdx = headers.indexOf('Date: ');
+var commaIdx = headers.indexOf(':', dateIdx + 5);
+var hours = 2 + parseInt(headers.substr(commaIdx - 2, 2));
+var minutes = parseInt(headers.substr(commaIdx + 1, 2));
+var seconds = parseInt(headers.substr(commaIdx + 4, 2));
 var startTime = hours + ':' + minutes + ':' + seconds;
 var end = 6;
 
@@ -122,7 +122,7 @@ function loop() {
             hours = 0;
         }
         loop();
-    }, 60000);
+    }, 300);
 }
 
 function init() {
