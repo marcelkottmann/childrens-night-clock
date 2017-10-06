@@ -122,7 +122,7 @@ function loop() {
             hours = 0;
         }
         loop();
-    }, 300);
+    }, 60000);
 }
 
 function init() {
