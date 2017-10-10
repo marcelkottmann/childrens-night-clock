@@ -97,14 +97,14 @@ var minutes = parseInt(headers.substr(commaIdx + 1, 2));
 var seconds = parseInt(headers.substr(commaIdx + 4, 2));
 var bootTime = hours + ':' + minutes + ':' + seconds;
 
+var now = {};
+
 function update() {
     print("Time: " + hours + ":" + minutes + ":" + seconds);
     print("Boot Time: " + bootTime);
 
-    var now = {
-        hour: hours,
-        minute: minutes
-    }
+    now.hour= hours;
+    now.minute= minutes;
 
     var activeSlice = between(now, start, end, 8);
     if (activeSlice === 0) {
