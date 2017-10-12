@@ -46,6 +46,7 @@ function between(now, start, end, divider) {
 
 var wifi = true;
 
+/*
 function printInfo() {
     info();
     setTimeout(function () {
@@ -53,6 +54,7 @@ function printInfo() {
     }, 10000);
 }
 printInfo();
+*/
 
 var state_r = [0, 0, 0, 0, 0, 0, 0, 0];
 var state_g = [0, 0, 0, 0, 0, 0, 0, 0];
