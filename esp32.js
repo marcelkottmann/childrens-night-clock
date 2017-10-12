@@ -9,14 +9,19 @@ var wifiStop = {
 };
 
 var start = {
-    hour: 19,
-    minute: 0
 };
 var end = {
-    hour: 6,
-    minute: 5
 };
 //-- END
+
+function loadConfig() {
+    start.hour = parseInt(el_load('timer.startHour')) || 19;
+    start.minute = parseInt(el_load('timer.startMin')) || 0;
+
+    end.hour = parseInt(el_load('timer.endHour')) || 6;
+    end.minute = parseInt(el_load('timer.endMinute')) || 5;
+}
+loadConfig();
 
 function between(now, start, end, divider) {
     var startTime = start.hour * 60 + start.minute;
@@ -84,9 +89,27 @@ function createLedTable() {
 
 requestHandler.push(function handleRequest(req, res) {
     if (req.path === '/status') {
-        res.end(page('Status', '<div>Time: ' + hours + ':' + minutes + ':' + seconds +
-            '</div><div>Boot Time: ' + bootTime + '</div>' +
-            createLedTable()));
+        if (req.method === 'GET') {
+            res.end(page('Status', '<div>Time: ' + hours + ':' + minutes + ':' + seconds +
+                '</div><div>Boot Time: ' + bootTime + '</div>' +
+                createLedTable() +
+                '<form action="/status" method="post">' +
+                'Timer Start: <input type="text" name="timerStartHour" size="2" value="' + start.hour + '" />:' +
+                '<input type="text" name="timerStartMinute" size="2" value="' + start.minute + '" /><br />' +
+                'Timer End: <input type="text" name="timerEndHour" size="2" value="' + end.hour + '" />:' +
+                '<input type="text" name="timerEndMinute" size="2" value="' + end.minute + '" /><br />' +
+                '<input type="submit" value="Save" /></form>'
+            ));
+        } else {
+            var config = parseQueryStr(req.body);
+            el_store('timer.startHour', config.timerStartHour);
+            el_store('timer.startMin', config.timerStartMinute);
+            el_store('timer.endHour', config.timerEndHour);
+            el_store('timer.endMinute', config.timerEndMinute);
+            loadConfig();
+            update();
+            res.end(page('Saved', JSON.stringify(config) + '<br /><a href="status">Status</a>'));
+        }
     }
 });
 
@@ -103,8 +126,8 @@ function update() {
     print("Time: " + hours + ":" + minutes + ":" + seconds);
     print("Boot Time: " + bootTime);
 
-    now.hour= hours;
-    now.minute= minutes;
+    now.hour = hours;
+    now.minute = minutes;
 
     var activeSlice = between(now, start, end, 8);
     if (activeSlice === 0) {
