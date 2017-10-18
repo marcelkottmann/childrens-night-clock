@@ -1,11 +1,7 @@
 // -- CONFIG
 var wifiStart = {
-    hour: 6,
-    minute: 15
 };
-var wifiStop = {
-    hour: 22,
-    minute: 30
+var wifiEnd = {
 };
 
 var start = {
@@ -20,6 +16,12 @@ function loadConfig() {
 
     end.hour = parseInt(el_load('timer.endHour')) || 6;
     end.minute = parseInt(el_load('timer.endMinute')) || 5;
+
+    wifiStart.hour = parseInt(el_load('wifi.startHour')) || 0;
+    wifiStart.minute = parseInt(el_load('wifi.startMin')) || 0;
+
+    wifiEnd.hour = parseInt(el_load('wifi.endHour')) || 24;
+    wifiEnd.minute = parseInt(el_load('wifi.endMinute')) || 0;
 }
 loadConfig();
 
@@ -38,7 +40,7 @@ function between(now, start, end, divider) {
 
     if (nowTime >= startTime && nowTime <= endTime) {
         var sliceSize = (endTime - startTime) / divider;
-        return slice = Math.ceil((nowTime - startTime) / sliceSize);
+        return slice = 1 + Math.floor((nowTime - startTime) / sliceSize);
     } else {
         return 0;
     }
@@ -100,6 +102,10 @@ requestHandler.push(function handleRequest(req, res) {
                 '<input type="text" name="timerStartMinute" size="2" value="' + start.minute + '" /><br />' +
                 'Timer End: <input type="text" name="timerEndHour" size="2" value="' + end.hour + '" />:' +
                 '<input type="text" name="timerEndMinute" size="2" value="' + end.minute + '" /><br />' +
+                'Wifi Start: <input type="text" name="wifiStartHour" size="2" value="' + wifiStart.hour + '" />:' +
+                '<input type="text" name="wifiStartMinute" size="2" value="' + wifiStart.minute + '" /><br />' +
+                'Wifi End: <input type="text" name="wifiEndHour" size="2" value="' + wifiEnd.hour + '" />:' +
+                '<input type="text" name="wifiEndMinute" size="2" value="' + wifiEnd.minute + '" /><br />' +
                 '<input type="submit" value="Save" /></form>'
             ));
         } else {
@@ -108,6 +114,10 @@ requestHandler.push(function handleRequest(req, res) {
             el_store('timer.startMin', config.timerStartMinute);
             el_store('timer.endHour', config.timerEndHour);
             el_store('timer.endMinute', config.timerEndMinute);
+            el_store('wifi.startHour', config.wifiStartHour);
+            el_store('wifi.startMin', config.wifiStartMinute);
+            el_store('wifi.endHour', config.wifiEndHour);
+            el_store('wifi.endMinute', config.wifiEndMinute);
             loadConfig();
             update();
             res.end(page('Saved', JSON.stringify(config) + '<br /><a href="status">Status</a>'));
@@ -153,13 +163,13 @@ function update() {
         }
     }
 
-    if (wifi && between(now, wifiStop, wifiStart, 1)) {
+    if (wifi && between(now, wifiEnd, wifiStart, 1)) {
         print('Timebased wifi shutdown...')
         wifi = false;
         stopWifi();
     }
 
-    if (!wifi && between(now, wifiStart, wifiStop, 1)) {
+    if (!wifi && between(now, wifiStart, wifiEnd, 1)) {
         print('Timebased wifi startup...')
         wifi = true;
         startWifi();
