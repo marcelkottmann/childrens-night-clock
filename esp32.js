@@ -6,11 +6,15 @@ var end = {
 //-- END
 
 function loadConfig() {
-    start.hour = parseInt(el_load('timer.startHour')) || 19;
-    start.minute = parseInt(el_load('timer.startMin')) || 0;
+    var starthour = el_load('timer.startHour');
+    var startmin = el_load('timer.startMin');
+    start.hour = starthour ? parseInt(starthour) : 19;
+    start.minute = startmin ? parseInt(startmin) : 0;
 
-    end.hour = parseInt(el_load('timer.endHour')) || 6;
-    end.minute = parseInt(el_load('timer.endMinute')) || 5;
+    var endhour = el_load('timer.endHour');
+    var endmin = el_load('timer.endMinute');
+    end.hour = endhour ? parseInt(endHour) : 6;
+    end.minute = endmin ? parseInt(endmin) : 5;
 }
 loadConfig();
 
