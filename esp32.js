@@ -13,7 +13,7 @@ function loadConfig() {
 
     var endhour = el_load('timer.endHour');
     var endmin = el_load('timer.endMinute');
-    end.hour = endhour ? parseInt(endHour) : 6;
+    end.hour = endhour ? parseInt(endhour) : 6;
     end.minute = endmin ? parseInt(endmin) : 5;
 }
 loadConfig();
