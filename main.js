@@ -31,7 +31,7 @@ function between(now, start, end, divider) {
         nowTime += (24 * 60);
     }
 
-    if (nowTime >= startTime && nowTime <= endTime) {
+    if (nowTime >= startTime && nowTime < endTime) {
         var sliceSize = (endTime - startTime) / divider;
         return slice = 1 + Math.floor((nowTime - startTime) / sliceSize);
     } else {
@@ -124,7 +124,7 @@ function update() {
     now.hour = hours;
     now.minute = minutes;
 
-    var activeSlice = between(now, start, end, 8);
+    var activeSlice = between(now, start, end, 7);
     if (activeSlice === 0) {
         // day mode
         activeSlice = between(now, end, start, 2);
@@ -137,6 +137,7 @@ function update() {
         }
     } else {
         // night mode
+        print('activeSlice: ' + activeSlice);
         for (var led = 0; led < 8; led++) {
             if (led < activeSlice) {
                 updateLed(led, 1, 0, 0);
